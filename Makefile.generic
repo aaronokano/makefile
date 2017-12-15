@@ -37,7 +37,7 @@ OBJECTS	:= $(addprefix $(OUTDIR)/,$(SOURCES:%.c=%.o))
 DEPENDS	:= $(OBJECTS:%.o=%.d)
 
 # Add the include directories into the CFLAGS
-CFLAGS	+= $(addprefix -I,$(INCDIRS))
+override CFLAGS	+= $(addprefix -I,$(INCDIRS))
 
 $(TARGET): $(OBJECTS)
 	@$(MKDIR) $(@D)
@@ -54,7 +54,7 @@ $(OUTDIR)/%.d: %.c
 
 $(OUTDIR)/%.o: %.c $(OUTDIR)/%.d
 	@$(MKDIR) $(@D)
-	$(CC) $(CFLAGS) $(LDLIBS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 -include $(DEPENDS)
 
