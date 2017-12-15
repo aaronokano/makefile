@@ -19,7 +19,6 @@
 #	OUTDIR	Directory to put build files
 #	LIBRARY	Set this variable to build a .a
 #	MKDIR	Set to appropriate directory-creating command
-#	RM	Set to appropriate rm command
 #
 
 
@@ -31,9 +30,6 @@ OUTDIR	?= out
 
 # The command used for mkdir will vary based on platform
 MKDIR	?= mkdir -p
-
-# The command for rm will vary based on platform
-RM	?= rm -rf
 
 # Find all .c files in SRCDIRS and generate .o and .d locations.
 SOURCES	:= $(foreach d,$(SRCDIRS),$(wildcard $(d)/*.c))
@@ -60,10 +56,10 @@ $(OUTDIR)/%.o: %.c $(OUTDIR)/%.d
 	@$(MKDIR) $(@D)
 	$(CC) $(CFLAGS) $(LDLIBS) -c $< -o $@
 
-include $(DEPENDS)
+-include $(DEPENDS)
 
 
 clean:
-	@$(RM) $(TARGET) $(OUTDIR)
+	@$(RM) -r $(TARGET) $(OUTDIR)
 
 
