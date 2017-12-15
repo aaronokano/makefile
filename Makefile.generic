@@ -1,0 +1,69 @@
+#
+# Simple, generic Makefile for small C projects.
+#
+# Author: Aaron Okano
+#
+# This Makefile can be used for C projects where you simply compile all source
+# files in a set of directories and link them all together. To use, just create
+# a Makefile with
+#
+#	SRCDIRS := <source directories>
+#	INCDIRS := <include paths>
+#	CFLAGS  := <desired compiler flags>
+#	LDLIBS  := <desired linker flags>
+#
+#	include <this Makefile>
+#
+# You can also optionally specify the following variables:
+# 	TARGET	Name of the final binary
+#	OUTDIR	Directory to put build files
+#	LIBRARY	Set this variable to build a .a
+#	MKDIR	Set to appropriate directory-creating command
+#	RM	Set to appropriate rm command
+#
+
+
+# Set the name of the final binary
+TARGET	?= $(shell basename `pwd`)
+
+# Place all the build files into OUTDIR
+OUTDIR	?= out
+
+# The command used for mkdir will vary based on platform
+MKDIR	?= mkdir -p
+
+# The command for rm will vary based on platform
+RM	?= rm -rf
+
+# Find all .c files in SRCDIRS and generate .o and .d locations.
+SOURCES	:= $(foreach d,$(SRCDIRS),$(wildcard $(d)/*.c))
+OBJECTS	:= $(addprefix $(OUTDIR)/,$(SOURCES:%.c=%.o))
+DEPENDS	:= $(OBJECTS:%.o=%.d)
+
+# Add the include directories into the CFLAGS
+CFLAGS	+= $(addprefix -I,$(INCDIRS))
+
+$(TARGET): $(OBJECTS)
+	@$(MKDIR) $(@D)
+ifdef LIBRARY
+	$(AR) rcs $@ $^
+else
+	$(CC) -o $@ $^ $(LDLIBS)
+endif
+
+$(OUTDIR)/%.d: %.c
+	@$(MKDIR) $(@D)
+	@$(CC) -MM $(CFLAGS) -MQ $(@:%.d=%.o) -MF $@ $<
+
+
+$(OUTDIR)/%.o: %.c $(OUTDIR)/%.d
+	@$(MKDIR) $(@D)
+	$(CC) $(CFLAGS) $(LDLIBS) -c $< -o $@
+
+include $(DEPENDS)
+
+
+clean:
+	@$(RM) $(TARGET) $(OUTDIR)
+
+
