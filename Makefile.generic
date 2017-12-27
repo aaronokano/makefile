@@ -14,11 +14,19 @@
 #
 #	include <this Makefile>
 #
+#	<add additional rules here>
+#
 # You can also optionally specify the following variables:
 # 	TARGET	Name of the final binary
 #	OUTDIR	Directory to put build files
 #	LIBRARY	Set this variable to build a .a
 #	MKDIR	Set to appropriate directory-creating command
+#
+# To add pre-build and post-build steps, just add new rules for the pre-build
+# and post-build targets using the double-colon notation, e.g.
+#
+# 	pre-build::
+# 		@echo "pre-build"
 #
 
 
@@ -38,6 +46,21 @@ DEPENDS	:= $(OBJECTS:%.o=%.d)
 
 # Add the include directories into the CFLAGS
 override CFLAGS	+= $(addprefix -I,$(INCDIRS))
+
+
+all:
+	@$(MAKE) --no-print-directory pre-build
+	@$(MAKE) --no-print-directory $(TARGET)
+	@$(MAKE) --no-print-directory post-build
+
+
+# pre-build and post-build do nothing by default
+pre-build::
+	@echo > /dev/null
+
+post-build::
+	@echo > /dev/null
+
 
 $(TARGET): $(OBJECTS)
 	@$(MKDIR) $(@D)
