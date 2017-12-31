@@ -82,7 +82,7 @@ $(OUTDIR)/%.o: %.c $(OUTDIR)/%.d
 -include $(DEPENDS)
 
 
-clean:
+clean::
 	@$(RM) -r $(TARGET) $(OUTDIR)
 
 
